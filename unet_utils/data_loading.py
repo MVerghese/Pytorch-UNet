@@ -48,14 +48,15 @@ class BasicDataset(Dataset):
             raise RuntimeError(f'No input file found in {images_dir}, make sure you put your images there')
 
         logging.info(f'Creating dataset with {len(self.ids)} examples')
-        logging.info('Scanning mask files to determine unique values')
-        with Pool() as p:
-            unique = list(tqdm(
-                p.imap(partial(unique_mask_values, mask_dir=self.mask_dir, mask_suffix=self.mask_suffix), self.ids),
-                total=len(self.ids)
-            ))
+        # logging.info('Scanning mask files to determine unique values')
+        # with Pool() as p:
+        #     unique = list(tqdm(
+        #         p.imap(partial(unique_mask_values, mask_dir=self.mask_dir, mask_suffix=self.mask_suffix), self.ids),
+        #         total=len(self.ids)
+        #     ))
 
-        self.mask_values = list(sorted(np.unique(np.concatenate(unique), axis=0).tolist()))
+        # self.mask_values = list(sorted(np.unique(np.concatenate(unique), axis=0).tolist()))
+        self.mask_values = [0, 1]
         logging.info(f'Unique mask values: {self.mask_values}')
 
     def __len__(self):
@@ -91,7 +92,9 @@ class BasicDataset(Dataset):
             return img
 
     def __getitem__(self, idx):
+
         name = self.ids[idx]
+        # logging.info(f'getting item {name}')
         mask_file = list(self.mask_dir.glob(name + self.mask_suffix + '.*'))
         img_file = list(self.images_dir.glob(name + '.*'))
 
